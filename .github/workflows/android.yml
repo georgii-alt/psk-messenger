@@ -7,7 +7,23 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Build Android APK
-        uses: ArtemSBulgakov/buildozer-action@v1
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          buildozer_version: stable
+          python-version: '3.11'
+
+      - name: Install Buildozer and Dependencies
+        run: |
+          pip install buildozer cython==0.29.36
+          sudo apt update
+          sudo apt install -y openjdk-17-jdk libssl-dev cmake unzip zip autoconf libtool pkg-config zlib1g-dev libncurses5-dev
+
+      - name: Build with Buildozer
+        run: |
+          buildozer -v android debug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: psk-messenger-apk
+          path: bin/*.apk
